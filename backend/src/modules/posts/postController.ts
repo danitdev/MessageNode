@@ -6,8 +6,8 @@ export const getPosts = async (
     res:Response,
     next:NextFunction)=>{
     try{
-        const {posts,totalItem} = await getPostsService();
-        
+        const result = await getPostsService();
+        res.status(200).json(result);
     }
     catch(err){
         next(err);
