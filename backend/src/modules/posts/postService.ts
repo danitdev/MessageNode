@@ -1,9 +1,27 @@
 import {prisma} from "../../lib/prisma.js";
 
 export const getPostsService = async()=>{
-    const [posts,totalItem] = await Promise.all([prisma.post.findMany(),prisma.post.count()]);
+    const posts = await prisma.post.findMany(
+    {
+        include:
+        {
+            creator:
+            {
+                select:
+                {
+                    name:true
+                }
+            }
+        },
+        orderBy:{
+            createdAt:"desc"
+        }
+    });
+    const totalItems = await prisma.post.count();
+
     return{
         posts,
-        totalItem
+        totalItems
     };
+
 };
