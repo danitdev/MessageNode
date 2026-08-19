@@ -78,6 +78,6 @@ coverage/
 # =========================
 # Prisma
 # =========================
-
+generated/
 # Prisma generated artifacts are normally ignored
 # depending on your Prisma setup.
