@@ -13,7 +13,14 @@ const fileStorage = multer.diskStorage({
         cb(null,Date.now()+"-"+file.originalname);
     }
 });
-
+const fileFilter = (req:Express.Request,file:Express.Multer.File,cb:multer.FileFilterCallback)=>{
+    if(file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg"){
+        cb(null,true);
+    }
+    else{
+        cb(null,false);
+    }
+}
 
 
 const upload = multer({storage:multer.memoryStorage()});
