@@ -4,6 +4,8 @@ import multer, { Multer } from "multer";
 import postRoutes from "./modules/posts/postRoutes.js";
 import path from "path";
 import __root_dir from "./utils/path.js";
+import {AppError} from "./errors/AppError.js";
+
 //file storage declared
 const fileStorage = multer.diskStorage({
     destination:(req,file,cb)=>{
@@ -37,5 +39,12 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use("/feed",postRoutes);
+app.use((error:AppError,req:express.Request,res:express.Response,next:express.NextFunction)=>{
+    const errStatus = error.statusCode;
+    const errMsg = error.message;
+    console.log(error);
+    res.status(errStatus).json({message:errMsg});
+});
+
 
 export {app};
