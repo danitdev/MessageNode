@@ -23,7 +23,6 @@ export const getPost = async(
     try{
         const postId = Number(req.params.postId);
         const post = await getPostService(postId);
-        console.log("cool");
         if(!post){
             throw new AppError("Post not found!",404);
         }
@@ -43,11 +42,15 @@ export const postPost = async (
     res:Response,
     next:NextFunction)=>{
         try{
+            console.log(req.file);
+            if(!req.file){
+                throw new AppError("No Image Provided",422);
+            }
             const data:CreatePostInput = {
                 title:req.body.title,
-                content:req.body.content
+                content:req.body.content,
             }
-            const post = await postPostService(data);
+            const post = await postPostService(data,req.file.filename);
             res.status(201).json({post});
         }
         catch(err){
