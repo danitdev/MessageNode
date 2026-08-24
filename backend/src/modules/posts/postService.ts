@@ -25,9 +25,10 @@ export const getPostsService = async()=>{
     };
 
 };
-export const postPostService = async(data:CreatePostInput)=>{;
+export const postPostService = async(data:CreatePostInput,imageFileName:string)=>{;
         const post = await prisma.post.create({data:{
             title: data.title,
+            imageUrl: `/images/${imageFileName}`,
             content: data.content,
             creatorId:1,
         }});
