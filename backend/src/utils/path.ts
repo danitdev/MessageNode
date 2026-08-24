@@ -1,8 +1,9 @@
 import path from "path";
-import {fileURLToPath} from "url";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname_utils = path.dirname(__filename);
-const __dirname_project = path.dirname(__dirname_utils);
+const __dirname = path.dirname(__filename);
 
-export default __dirname_project;
+const projectRoot = path.resolve(__dirname, "../..");
+
+export default projectRoot;
