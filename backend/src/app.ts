@@ -33,7 +33,7 @@ const app = express();
 //setting the upload for app to use
 app.use(upload);
 //adding the /images folder as a static folder
-app.use("/images",express.static(path.join(__root_dir,"images")))
+app.use("/images",express.static(path.join(__root_dir,"/images")))
 app.use(cors({
     origin:"http://localhost:3000"
 }));
