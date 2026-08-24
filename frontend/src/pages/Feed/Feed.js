@@ -88,7 +88,7 @@ class Feed extends Component {
 
   startEditPostHandler = postId => {
     this.setState(prevState => {
-      const loadedPost = { ...prevState.posts.find(p => p._id === postId) };
+      const loadedPost = { ...prevState.posts.find(p => p.id === postId) };
 
       return {
         isEditing: true,
@@ -107,20 +107,19 @@ class Feed extends Component {
     });
     // Set up data (with image!)
     let url = 'http://localhost:8080/feed/post';
-    let method = "POST";
+    let method = 'POST';
     if (this.state.editPost) {
       url = 'URL';
     }
 
-    fetch(url,{
+    fetch(url, {
       method: method,
-      headers:{
-        'Content-Type':'application/json'
+      headers: {
+        'Content-Type': 'application/json'
       },
-      //sending the data backend
       body: JSON.stringify({
-        title:postData.title,
-        content:postData.content
+        title: postData.title,
+        content: postData.content
       })
     })
       .then(res => {
@@ -130,8 +129,9 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
+        console.log(resData);
         const post = {
-          _id: resData.post.id,
+          id: resData.post.id,
           title: resData.post.title,
           content: resData.post.content,
           creator: resData.post.creator,
@@ -141,7 +141,7 @@ class Feed extends Component {
           let updatedPosts = [...prevState.posts];
           if (prevState.editPost) {
             const postIndex = prevState.posts.findIndex(
-              p => p._id === prevState.editpost.id
+              p => p.id === prevState.editpost.id
             );
             updatedPosts[postIndex] = post;
           } else if (prevState.posts.length < 2) {
@@ -182,7 +182,7 @@ class Feed extends Component {
       .then(resData => {
         console.log(resData);
         this.setState(prevState => {
-          const updatedPosts = prevState.posts.filter(p => p._id !== postId);
+          const updatedPosts = prevState.posts.filter(p => p.id !== postId);
           return { posts: updatedPosts, postsLoading: false };
         });
       })
