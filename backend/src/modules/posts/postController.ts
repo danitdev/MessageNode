@@ -34,8 +34,8 @@ export const getPost = async(
             if(!err.statusCode){
                 err.statusCode = 500;
             }
-            next(err);
         }
+        next(err);
     }
 };
 export const postPost = async (
@@ -55,7 +55,7 @@ export const postPost = async (
                 if(!err.statusCode){
                     err.statusCode = 500;
                 }
-                next(err);
             }
+            next(err);
         }
     }
