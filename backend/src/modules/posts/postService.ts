@@ -34,6 +34,17 @@ export const postPostService = async(data:CreatePostInput)=>{;
         return post;
 }
 export const getPostService = async(postId:number)=>{
-    return await prisma.post.findUnique({where:{id:postId}});
+    return await prisma.post.findUnique(
+        {
+            where:{id:postId},
+            include:{
+                creator:{
+                    select:{
+                        name:true
+                    }
+                }
+            }
+        }
+    );
  
 }
