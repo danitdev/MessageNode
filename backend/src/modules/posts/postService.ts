@@ -58,14 +58,11 @@ export const updatePostService = async(
     updatedTitle:string,
     updatedContent:string,
     updatedImageUrl?:string)=>{
-    //check whether post exist or not
-    if(!updatedImageUrl){
-        throw new AppError("No file picked.",422);
-    }
     const post = await prisma.post.findUnique({
         where:{id:postId},
         select:{id:true,imageUrl:true}
     });
+    //check whether post exist or not
     if(!post){throw new AppError("Couldn't find the post.",404)}
     const data:{
         title:string;
