@@ -3,7 +3,7 @@ import {prisma} from "../../lib/prisma.js";
 import {CreatePostInput,createPostSchema} from "./postSchema.js";
 import {deleteImage} from "../../utils/deleteImage.js"
 
-export const getPostsService = async()=>{
+export const getPostsService = async(perPage:number,currentPage:number)=>{
     const posts = await prisma.post.findMany(
     {
         include:
@@ -18,7 +18,9 @@ export const getPostsService = async()=>{
         },
         orderBy:{
             createdAt:"desc"
-        }
+        },
+        skip:(currentPage-1)*perPage,
+        take:perPage
     });
     const totalItems = await prisma.post.count();
 
