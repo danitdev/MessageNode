@@ -70,13 +70,11 @@ export const updatePost = async(
             const postId = Number(req.params.postId);
             const updatedTitle = req.body.title;
             const updatedContent = req.body.content;
-            let updatedImageUrl = req.body.image;
-            let hasNewImage = false;
+            let updatedImageUrl: string | undefined;
             if(req.file){
-                hasNewImage = true;
                 updatedImageUrl = `/images/${req.file.filename}`
             }
-            const updatedPost = await updatePostService(postId,updatedTitle,updatedContent,updatedImageUrl,hasNewImage);
+            const updatedPost = await updatePostService(postId,updatedTitle,updatedContent,updatedImageUrl);
             if(updatedPost){
                 res.status(200).json({message:"Post Updated!",post:updatedPost});
             }
