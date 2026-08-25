@@ -92,3 +92,11 @@ export const updatePostService = async(
     return updatedPost;
 
 }
+export const deletePostService = async(postId:number)=>{
+    const existingPost = await prisma.post.findUnique({where:{id:postId},select:{id:true,imageUrl:true}});
+    if(!existingPost){throw new AppError("post not found.",404);}
+    await prisma.post.delete({where:{id:postId}});
+    if(existingPost.imageUrl){
+        await deleteImage(existingPost.imageUrl);
+    } 
+};
