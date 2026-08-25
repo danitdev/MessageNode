@@ -4,13 +4,21 @@ import {getPostsService,getPostService,postPostService,updatePostService,deleteP
 import {CreatePostInput} from "./postSchema.js"
 import {AppError} from "../../errors/AppError.js"
 import {deleteImage} from "../../utils/deleteImage.js";
+import { PostScalarFieldEnum } from "../../generated/prisma/internal/prismaNamespace.js";
 export const getPosts = async (
     req:Request,
     res:Response,
     next:NextFunction)=>{
     try{
-        const result = await getPostsService();
-        res.status(200).json(result);
+        const currentPage = Number(req.query.page) || 1;
+        const perPage = 2;
+        const result = await getPostsService(perPage,currentPage);
+        res.status(200).json(
+            {
+                message:"Fetched posts successfully",
+                posts:result.posts,
+                totalItems:result.totalItems
+            });
     }
     catch(err){
         next(err);
