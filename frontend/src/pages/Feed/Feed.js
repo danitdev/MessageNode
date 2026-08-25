@@ -117,7 +117,8 @@ class Feed extends Component {
     let url = 'http://localhost:8080/feed/post';
     let method = 'POST';
     if (this.state.editPost) {
-      url = 'URL';
+      url = 'http://localhost:8080/feed/post/'+this.state.editPost.id;
+      method = "PUT";
     }
 
     fetch(url, {
@@ -143,7 +144,7 @@ class Feed extends Component {
           let updatedPosts = [...prevState.posts];
           if (prevState.editPost) {
             const postIndex = prevState.posts.findIndex(
-              p => p.id === prevState.editpost.id
+              p => p.id === prevState.editPost.id
             );
             updatedPosts[postIndex] = post;
           } else if (prevState.posts.length < 2) {
