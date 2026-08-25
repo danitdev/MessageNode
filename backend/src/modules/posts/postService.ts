@@ -53,7 +53,11 @@ export const getPostService = async(postId:number)=>{
  
 }
 
-export const updatePostService = async(postId:number,updatedTitle:string,updatedContent:string,updatedImageUrl:string,hasNewImage:boolean)=>{
+export const updatePostService = async(
+    postId:number,
+    updatedTitle:string,
+    updatedContent:string,
+    updatedImageUrl?:string)=>{
     //check whether post exist or not
     if(!updatedImageUrl){
         throw new AppError("No file picked.",422);
@@ -63,13 +67,20 @@ export const updatePostService = async(postId:number,updatedTitle:string,updated
         select:{id:true,imageUrl:true}
     });
     if(!post){throw new AppError("Couldn't find the post.",404)}
+    const data:{
+        title:string;
+        content:string;
+        imageUrl?:string;
+    } = {
+        title:updatedTitle,
+        content:updatedContent
+    };
+    if(updatedImageUrl !== undefined){
+        data.imageUrl = updatedImageUrl;
+    }
     const updatedPost = await prisma.post.update({
         where:{id:postId},
-        data:{
-            title:updatedTitle,
-            content:updatedContent,
-            imageUrl:updatedImageUrl
-        },
+        data:data,
         include:{
             creator:{
                 select:{
@@ -78,7 +89,7 @@ export const updatePostService = async(postId:number,updatedTitle:string,updated
             }
         }
     });
-    if(hasNewImage && post.imageUrl !== null){
+    if(updatedImageUrl !== undefined && post.imageUrl){
         await deleteImage(post.imageUrl);
     }
     return updatedPost;
