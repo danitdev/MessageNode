@@ -8,7 +8,7 @@ export const validate = (schema:ZodType)=>{
         console.log(result.error?.flatten());
         if(!result.success){
             throw new AppError(
-                "Validation failed, entered data is incorrect.",
+                "Validation failed,entered data is incorrect.",
                 422);
             // return res.status(422).json({
             //     message:"Validation failed",
