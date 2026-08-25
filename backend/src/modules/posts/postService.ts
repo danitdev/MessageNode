@@ -1,5 +1,8 @@
+import { AppError } from "../../errors/AppError.js";
 import {prisma} from "../../lib/prisma.js";
 import {CreatePostInput,createPostSchema} from "./postSchema.js";
+import {deleteImage} from "../../utils/deleteImage.js"
+
 export const getPostsService = async()=>{
     const posts = await prisma.post.findMany(
     {
@@ -48,4 +51,29 @@ export const getPostService = async(postId:number)=>{
         }
     );
  
+}
+
+export const updatePostService = async(postId:number,updatedTitle:string,updatedContent:string,updatedImageUrl:string,hasNewImage:boolean)=>{
+    //check whether post exist or not
+    if(!updatedImageUrl){
+        throw new AppError("No file picked.",422);
+    }
+    const post = await prisma.post.findUnique({
+        where:{id:postId},
+        select:{id:true,imageUrl:true}
+    });
+    if(!post){throw new AppError("Couldn't find the post.",404)}
+    const updatedPost = await prisma.post.update({
+        where:{id:postId},
+        data:{
+            title:updatedTitle,
+            content:updatedContent,
+            imageUrl:updatedImageUrl
+        }
+    });
+    if(hasNewImage && post.imageUrl !== null){
+        await deleteImage(post.imageUrl);
+    }
+    return updatedPost;
+
 }
