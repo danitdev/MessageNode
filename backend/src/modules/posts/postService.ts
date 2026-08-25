@@ -69,6 +69,13 @@ export const updatePostService = async(postId:number,updatedTitle:string,updated
             title:updatedTitle,
             content:updatedContent,
             imageUrl:updatedImageUrl
+        },
+        include:{
+            creator:{
+                select:{
+                    name:true
+                }
+            }
         }
     });
     if(hasNewImage && post.imageUrl !== null){
