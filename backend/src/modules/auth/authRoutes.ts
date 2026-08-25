@@ -5,6 +5,6 @@ import {signUp} from "./authController.js";
 
 const router = Router();
 
-router.put("/singup",validate(registerUserSchema),signUp);
+router.put("/signup",validate(registerUserSchema),signUp);
 
 export default router;
