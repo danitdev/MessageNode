@@ -4,7 +4,6 @@ import {getPostsService,getPostService,postPostService,updatePostService,deleteP
 import {CreatePostInput} from "./postSchema.js"
 import {AppError} from "../../errors/AppError.js"
 import {deleteImage} from "../../utils/deleteImage.js";
-import { PostScalarFieldEnum } from "../../generated/prisma/internal/prismaNamespace.js";
 export const getPosts = async (
     req:Request,
     res:Response,
