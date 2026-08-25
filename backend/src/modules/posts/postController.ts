@@ -1,9 +1,9 @@
 
 import type { Request,Response,NextFunction } from "express";
-import {getPostsService,getPostService,postPostService} from "./postService.js";
+import {getPostsService,getPostService,postPostService,updatePostService} from "./postService.js";
 import {CreatePostInput} from "./postSchema.js"
 import {AppError} from "../../errors/AppError.js"
-
+import {deleteImage} from "../../utils/deleteImage.js";
 export const getPosts = async (
     req:Request,
     res:Response,
@@ -62,3 +62,31 @@ export const postPost = async (
             next(err);
         }
     }
+export const updatePost = async(
+    req:Request,
+    res:Response,
+    next:NextFunction)=>{
+        try{
+            const postId = Number(req.params.postId);
+            const updatedTitle = req.body.title;
+            const updatedContent = req.body.content;
+            let updatedImageUrl = req.body.image;
+            let hasNewImage = false;
+            if(req.file){
+                hasNewImage = true;
+                updatedImageUrl = `/images/${req.file.filename}`
+            }
+            const updatedPost = await updatePostService(postId,updatedTitle,updatedContent,updatedImageUrl,hasNewImage);
+            if(updatedPost){
+                res.status(200).json({message:"Post Updated!",post:updatedPost});
+            }
+        }
+        catch(err){
+            if(err instanceof AppError){
+                if(!err.statusCode){
+                    err.statusCode=500;
+                }
+            }
+            next(err);
+        }
+}
