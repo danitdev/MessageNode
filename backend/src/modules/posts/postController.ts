@@ -1,6 +1,6 @@
 
 import type { Request,Response,NextFunction } from "express";
-import {getPostsService,getPostService,postPostService,updatePostService} from "./postService.js";
+import {getPostsService,getPostService,postPostService,updatePostService,deletePostService} from "./postService.js";
 import {CreatePostInput} from "./postSchema.js"
 import {AppError} from "../../errors/AppError.js"
 import {deleteImage} from "../../utils/deleteImage.js";
@@ -88,3 +88,23 @@ export const updatePost = async(
             next(err);
         }
 }
+export const deletePost = async(
+    req:Request,
+    res:Response,
+    next:NextFunction)=>{
+        try{
+            const postId = Number(req.params.postId);
+            await deletePostService(postId);
+            res.status(200).json({message:"deleted post."})
+        }
+        catch(err){
+            if(err instanceof AppError){
+                if(!err.statusCode){
+                    err.statusCode=500;
+                }
+            }
+            next(err);
+        }
+        
+        
+    }
