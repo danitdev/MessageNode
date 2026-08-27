@@ -30,7 +30,7 @@ export const getPost = async(
     next:NextFunction)=>{
     try{
         const postId = Number(req.params.postId);
-        const post = await getPostService(postId);
+        const post = await getPostService(req.userId!,postId);
         if(!post){
             throw new AppError("Post not found!",404);
         }
