@@ -3,6 +3,7 @@ import cors from "cors";
 import multer, { Multer } from "multer";
 import postRoutes from "./modules/posts/postRoutes.js";
 import authRoutes from "./modules/auth/authRoutes.js";
+import statusRoutes from "./modules/status/statusRoutes.js";
 import path from "path";
 import __root_dir from "./utils/path.js";
 import {AppError} from "./errors/AppError.js";
@@ -41,6 +42,8 @@ app.use(cors({
 app.use(express.json());
 app.use("/feed",postRoutes);
 app.use("/auth",authRoutes);
+app.use(statusRoutes);
+
 app.use((error:AppError,req:express.Request,res:express.Response,next:express.NextFunction)=>{
     const errStatus = error.statusCode;
     const errMsg = error.message;
