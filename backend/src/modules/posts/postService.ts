@@ -24,7 +24,11 @@ export const getPostsService = async(userId:number,perPage:number,currentPage:nu
         skip:(currentPage-1)*perPage,
         take:perPage
     });
-    const totalItems = await prisma.post.count();
+    const totalItems = await prisma.post.count({
+        where:{
+            creatorId:userId
+        }
+    });
 
     return{
         posts,
