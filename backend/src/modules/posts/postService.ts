@@ -2,7 +2,6 @@ import { AppError } from "../../errors/AppError.js";
 import {prisma} from "../../lib/prisma.js";
 import {CreatePostInput,createPostSchema} from "./postSchema.js";
 import {deleteImage} from "../../utils/deleteImage.js"
-import { userInfo } from "node:os";
 
 export const getPostsService = async(userId:number,perPage:number,currentPage:number)=>{
     const posts = await prisma.post.findMany(
