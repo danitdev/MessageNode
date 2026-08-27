@@ -1,39 +1,42 @@
 # Message Node
 
-A full-stack social messaging/feed application built while modernizing an older React project into a **TypeScript + Express + Prisma** backend.
+A full-stack social feed application built by modernizing an older React project with a **TypeScript + Express + Prisma** backend.
 
-The project is currently focused on building a clean REST API with proper service/controller separation, validation, file uploads, database access, and centralized error handling.
+The project focuses on clean backend architecture, authentication, authorization, validation, database access, and file uploads.
 
 ---
 
-## 🚧 Project Status
+## 🚧 Status
 
 **In active development.**
 
-Current backend work includes:
+### Implemented
 
-* [x] TypeScript backend
-* [x] Express server
-* [x] Prisma ORM
-* [x] MySQL database
-* [x] Post model
-* [x] User/Post relationship
-* [x] Get all posts
-* [x] Get a single post
-* [x] Create a post
-* [x] Update a post
-* [x] Image upload with Multer
-* [x] Static image serving
-* [x] Image cleanup when replacing images
-* [x] Custom `AppError`
-* [x] Centralized Express error handling
-* [x] Zod-based request validation setup
-* [ ] Delete post
-* [ ] Authentication/authorization
-* [ ] User ownership checks
-* [ ] Production-ready image storage
-* [ ] Complete API documentation
-* [ ] Frontend migration/modernization
+- TypeScript + Express backend
+- Prisma + MySQL
+- User registration and login
+- JWT authentication
+- Argon2id password hashing
+- Authentication middleware
+- Post CRUD operations
+- Post ownership and authorization
+- Pagination
+- User status management
+- Image uploads with Multer
+- Local image serving and cleanup
+- Zod request validation
+- Centralized error handling
+- React frontend integration
+
+### Planned
+
+- Automated tests
+- Production image storage
+- Login validation
+- Rate limiting and security hardening
+- API documentation
+- Frontend modernization
+- Production deployment
 
 ---
 
@@ -41,32 +44,37 @@ Current backend work includes:
 
 ### Frontend
 
-* React
-* React Router
-* CSS
-* Fetch API
-
-The frontend originated from an older React application and is being progressively adapted to communicate with the new backend.
+- React
+- React Router
+- CSS
+- Fetch API
 
 ### Backend
 
-* Node.js
-* Express
-* TypeScript
-* Prisma
-* MySQL
-* Zod
-* Multer
+- Node.js
+- Express
+- TypeScript
+- Prisma
+- MySQL
+- Zod
+- Multer
+- Argon2
+- JSON Web Tokens
 
-### Architecture
+---
 
-The backend follows a layered structure:
+## 🏗️ Architecture
+
+Message Node follows a layered backend architecture:
 
 ```text
 Request
    │
    ▼
-Express Route
+Middleware
+   │
+   ▼
+Route
    │
    ▼
 Controller
@@ -81,379 +89,166 @@ Prisma
 MySQL
 ```
 
-Controllers are responsible primarily for HTTP concerns, while services contain application/database logic.
+Controllers handle HTTP concerns while services contain application and database logic.
+
+Authentication and authorization are handled through middleware and service-level ownership checks.
 
 ---
 
-## 📁 Backend Architecture
+## 🔐 Authentication
 
-The backend is organized by feature rather than putting all controllers and services into global folders.
+Authentication uses **JWT** with **Argon2id** password hashing.
 
-Example:
+Protected requests use:
 
-```text
-src/
-├── errors/
-│   └── AppError.ts
-│
-├── lib/
-│   └── prisma.ts
-│
-├── utils/
-│   ├── path.ts
-│   └── deleteImage.ts
-│
-├── modules/
-│   └── posts/
-│       ├── postController.ts
-│       ├── postService.ts
-│       └── postSchema.ts
-│
-├── app.ts
-└── server.ts
+```http
+Authorization: Bearer <token>
 ```
 
-The exact folder names may evolve as the project continues to grow.
+Authenticated user information is propagated through the Express request and used for authorization and resource ownership checks.
 
 ---
 
 ## 📝 Posts
 
-Posts currently contain information such as:
+Users can:
 
-```text
-Post
-├── id
-├── title
-├── content
-├── imageUrl
-├── creatorId
-└── createdAt
-```
+- Create posts
+- View posts
+- View individual posts
+- Edit their own posts
+- Delete their own posts
+- Upload images
+- Replace post images
 
-Posts have a relationship with a `User` through `creatorId`.
-
----
-
-## 🔌 API
-
-The current API is centered around posts.
-
-### Get all posts
-
-```http
-GET /posts
-```
-
-Returns the posts ordered by creation date, along with creator information.
-
-Example response:
-
-```json
-{
-  "posts": [
-    {
-      "id": 1,
-      "title": "Hello World",
-      "content": "My first post",
-      "imageUrl": "/images/example.jpg",
-      "creator": {
-        "name": "User"
-      }
-    }
-  ],
-  "totalItems": 1
-}
-```
-
----
-
-### Get a single post
-
-```http
-GET /posts/:postId
-```
-
-Returns a single post and its creator.
-
-If the post doesn't exist:
-
-```http
-404 Not Found
-```
-
----
-
-### Create a post
-
-```http
-POST /posts
-```
-
-The endpoint accepts multipart form data because posts can contain an image.
-
-Example fields:
-
-```text
-title
-content
-image
-```
-
-The image is processed using Multer and stored on the server.
-
----
-
-### Update a post
-
-```http
-PUT /posts/:postId
-```
-
-The update endpoint currently accepts:
-
-```text
-title
-content
-image
-```
-
-When a new image is uploaded:
-
-```text
-New image
-   ↓
-Multer saves new file
-   ↓
-Database updated with new image URL
-   ↓
-Old image deleted
-```
-
-The old image is retrieved from the existing database record rather than trusting a client-provided path.
+Posts are associated with their creator through a Prisma relationship.
 
 ---
 
 ## 🖼️ Image Uploads
 
-Multer handles uploaded images.
+Images are uploaded using **Multer** and currently stored on the local filesystem.
 
-Uploaded images are served through Express static middleware:
-
-```ts
-app.use("/images", express.static(...));
-```
-
-Images are referenced by URLs such as:
+Images are served through:
 
 ```text
-/images/1723456789-example.jpg
+/images/<filename>
 ```
 
-When replacing an existing post image, the backend:
+When posts are updated or deleted, associated image files are cleaned up.
 
-1. Finds the existing post.
-2. Stores the old image URL.
-3. Updates the database.
-4. Deletes the old image from disk.
-5. Returns the updated post.
-
-The database update happens **before** deleting the old image to avoid deleting the existing image if the database update fails.
+Production object storage is planned for a future deployment.
 
 ---
 
-## ⚠️ Error Handling
+## 📡 API
 
-The backend uses a custom `AppError` class for application-level errors.
+### Authentication
 
-Example:
+| Method | Endpoint | Description |
+|---|---|---|
+| PUT | `/auth/signup` | Register |
+| POST | `/auth/login` | Login |
 
-```ts
-throw new AppError("Couldn't find the post.", 404);
-```
+### Posts
 
-Controllers forward errors to Express:
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/feed/posts` | Get user's posts |
+| GET | `/feed/post/:postId` | Get a post |
+| POST | `/feed/post` | Create a post |
+| PUT | `/feed/post/:postId` | Update a post |
+| DELETE | `/feed/post/:postId` | Delete a post |
 
-```ts
-catch (err) {
-    next(err);
-}
-```
+### Status
 
-A centralized error-handling middleware is responsible for converting errors into HTTP responses.
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/status` | Get user status |
+| PATCH | `/status` | Update user status |
 
-This keeps controllers from having to duplicate error-response logic.
-
----
-
-## ✅ Validation
-
-Request validation is being implemented using **Zod**.
-
-Schemas define the expected structure of incoming data rather than relying solely on TypeScript types.
-
-For example:
-
-```ts
-const createPostSchema = z.object({
-    title: z.string(),
-    content: z.string()
-});
-```
-
-TypeScript types can then be inferred from schemas:
-
-```ts
-type CreatePostInput = z.infer<typeof createPostSchema>;
-```
-
-This provides both runtime validation and compile-time type safety.
+Protected endpoints require authentication.
 
 ---
 
-## 🗄️ Database
+## 📦 Running Locally
 
-The project uses **Prisma** as its ORM with MySQL.
-
-Prisma is responsible for:
-
-* Querying posts
-* Creating posts
-* Updating posts
-* Counting posts
-* Loading relationships
-* Selecting only required fields
-
-For example, when checking whether a post exists, only the fields required by the operation can be selected:
-
-```ts
-const post = await prisma.post.findUnique({
-    where: {
-        id: postId
-    },
-    select: {
-        id: true,
-        imageUrl: true
-    }
-});
-```
-
-This avoids unnecessarily retrieving the entire record.
-
----
-
-## 🧱 Service Layer
-
-Database operations are kept inside services instead of directly inside controllers.
-
-For example:
-
-```text
-postController
-      │
-      ▼
-updatePostService()
-      │
-      ├── validate operation
-      ├── find existing post
-      ├── update database
-      └── clean up old image
-```
-
-This makes the controller primarily responsible for translating HTTP requests into service calls.
-
----
-
-## 🧪 Development
-
-Install dependencies:
+### Backend
 
 ```bash
+cd backend
 npm install
+npx prisma generate
+npm run dev
 ```
 
-Generate the Prisma client:
+The backend runs on:
+
+```text
+http://localhost:8080
+```
+
+### Frontend
 
 ```bash
-npx prisma generate
+cd frontend
+npm install
+npm start
 ```
 
-Run the development server according to the project's configured npm scripts.
+The frontend runs on:
+
+```text
+http://localhost:3000
+```
 
 ---
 
 ## 🔐 Environment Variables
 
-Sensitive configuration should be stored in environment variables rather than committed to Git.
-
-Typical configuration includes:
+Create a `.env` file in the backend:
 
 ```env
-DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=...
+DB_PASSWORD=...
+DB_NAME=message-node
+
+JWT_SECRET=...
 PORT=8080
 ```
 
-Do not commit `.env` files containing real credentials.
+Never commit real credentials or secrets.
 
 ---
 
 ## 🗺️ Roadmap
 
-### Backend
-
-* [ ] Complete CRUD operations
-* [ ] Authentication
-* [ ] Password hashing
-* [ ] JWT/session strategy
-* [ ] Authorization
-* [ ] Post ownership checks
-* [ ] Better request validation
-* [ ] Pagination
-* [ ] Filtering/search
-* [ ] Rate limiting
-* [ ] Production logging
-* [ ] Automated tests
-* [ ] API documentation
-
-### File Storage
-
-The current implementation stores images locally.
-
-Future production storage can use:
-
-* Amazon S3
-* Cloudflare R2
-* Cloudinary
-
-This would allow the application to scale beyond a single server filesystem.
-
-### Frontend
-
-* [ ] Modernize React architecture
-* [ ] Connect all pages to the new API
-* [ ] Improve loading/error states
-* [ ] Modernize routing
-* [ ] Improve post editing
-* [ ] Authentication integration
-* [ ] Better API abstraction
+- [ ] Automated testing
+- [ ] Production image storage
+- [ ] API documentation
+- [ ] Rate limiting
+- [ ] Production logging
+- [ ] Security hardening
+- [ ] Docker deployment
+- [ ] CI/CD
+- [ ] Frontend modernization
+- [ ] Production deployment
 
 ---
 
-## 🎯 Architecture Goals
+## 🎯 Project Goals
 
-The long-term goal is to turn Message Node into a maintainable full-stack application with:
+Message Node is being developed as a practical full-stack project with an emphasis on:
 
-* Strong TypeScript typing
-* Runtime validation
-* Clean separation of concerns
-* Centralized error handling
-* Secure authentication and authorization
-* Scalable database access
-* Reliable file storage
-* Testable business logic
-* Production-ready API design
-
-The project is intentionally being developed incrementally, with the backend architecture being improved rather than simply reproducing the original application's implementation.
+- Type-safe backend development
+- Clean architecture
+- Secure authentication
+- Resource authorization
+- Runtime validation
+- Maintainable database access
+- Production-ready engineering practices
 
 ---
 
