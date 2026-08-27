@@ -13,5 +13,14 @@ export const registerUserSchema = z.object({
         .string()
         .min(8,"password must be at least 8 characters.")
 });
+export const loginUserSchema = z.object({
+    email:z
+        .email("Invalid Email Address!")
+    ,
+    password:z
+        .string()
+        .min(8,"password must be at least 8 characters.")
+});
 
 export type RegisterUserInput = z.infer<typeof registerUserSchema>;
+export type LoginUserInput = z.infer<typeof loginUserSchema>;
