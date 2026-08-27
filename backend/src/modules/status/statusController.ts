@@ -20,7 +20,7 @@ export const getStatus = async(
         }
 
     }
-export const postStatus = async(
+export const patchStatus = async(
     req: Request,
     res: Response,
     next: NextFunction)=>{
