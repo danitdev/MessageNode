@@ -50,7 +50,6 @@ export const postPost = async (
     res:Response,
     next:NextFunction)=>{
         try{
-            console.log(req.file);
             if(!req.file){
                 throw new AppError("No Image Provided",422);
             }
