@@ -4,6 +4,7 @@ import {getPostsService,getPostService,postPostService,updatePostService,deleteP
 import {CreatePostInput} from "./postSchema.js"
 import {AppError} from "../../errors/AppError.js"
 import {deleteImage} from "../../utils/deleteImage.js";
+import { prisma } from "../../lib/prisma.js";
 export const getPosts = async (
     req:Request,
     res:Response,
@@ -11,11 +12,11 @@ export const getPosts = async (
     try{
         const currentPage = Number(req.query.page) || 1;
         const perPage = 2;
-        const result = await getPostsService(perPage,currentPage);
+        const result = await getPostsService(req.userId!,perPage,currentPage);
         res.status(200).json(
             {
                 message:"Fetched posts successfully",
-                posts:result.posts,
+                posts:result.posts, 
                 totalItems:result.totalItems
             });
     }
@@ -57,7 +58,7 @@ export const postPost = async (
                 title:req.body.title,
                 content:req.body.content,
             }
-            const post = await postPostService(data,req.file.filename);
+            const post = await postPostService(data,req.file.filename,req.userId!);
             res.status(201).json({post});
         }
         catch(err){
@@ -81,7 +82,7 @@ export const updatePost = async(
             if(req.file){
                 updatedImageUrl = `/images/${req.file.filename}`
             }
-            const updatedPost = await updatePostService(postId,updatedTitle,updatedContent,updatedImageUrl);
+            const updatedPost = await updatePostService(req.userId!,postId,updatedTitle,updatedContent,updatedImageUrl);
             if(updatedPost){
                 res.status(200).json({message:"Post Updated!",post:updatedPost});
             }
@@ -101,7 +102,7 @@ export const deletePost = async(
     next:NextFunction)=>{
         try{
             const postId = Number(req.params.postId);
-            await deletePostService(postId);
+            await deletePostService(req.userId!,postId);
             res.status(200).json({message:"deleted post."})
         }
         catch(err){
