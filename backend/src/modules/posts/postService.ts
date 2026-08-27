@@ -42,10 +42,10 @@ export const postPostService = async(data:CreatePostInput,imageFileName:string,u
         }});
         return post;
 }
-export const getPostService = async(postId:number)=>{
+export const getPostService = async(userId:number,postId:number)=>{
     return await prisma.post.findUnique(
         {
-            where:{id:postId},
+            where:{id:postId,creatorId:userId},
             include:{
                 creator:{
                     select:{
