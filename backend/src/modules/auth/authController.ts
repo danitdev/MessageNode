@@ -35,6 +35,11 @@ export const login = async(
             res.status(200).json({token:token,userId:userId});
               
         }catch(err){
-             
+            if(err instanceof AppError){
+                if(!err.statusCode){
+                    err.statusCode = 500;
+                }
+            }
+            next(err);  
         }
 };
