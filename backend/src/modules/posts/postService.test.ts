@@ -1,5 +1,5 @@
 import {describe,it,expect,vi,beforeEach} from "vitest";
-import {deletePostService,updatePostService} from "./postService.js";
+import {deletePostService,updatePostService,getPostService,getPostsService,postPostService} from "./postService.js";
 import {prisma} from "../../lib/prisma.js";
 import { deleteImage } from "../../utils/deleteImage.js";
 import { deletePost } from "./postController.js";
@@ -7,6 +7,9 @@ import { deletePost } from "./postController.js";
 vi.mock("../../lib/prisma.js",()=>({
     prisma:{
         post:{
+            findMany:vi.fn(),
+            count:vi.fn(),
+            create:vi.fn(),
             findUnique: vi.fn(),
             delete:vi.fn(),
             update:vi.fn()
