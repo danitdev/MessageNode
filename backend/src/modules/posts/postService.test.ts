@@ -1,5 +1,5 @@
 import {describe,it,expect,vi,beforeEach} from "vitest";
-import {deletePostService} from "./postService.js";
+import {deletePostService,updatePostService} from "./postService.js";
 import {prisma} from "../../lib/prisma.js";
 import { deleteImage } from "../../utils/deleteImage.js";
 import { deletePost } from "./postController.js";
@@ -8,14 +8,28 @@ vi.mock("../../lib/prisma.js",()=>({
     prisma:{
         post:{
             findUnique: vi.fn(),
-            delete:vi.fn()
+            delete:vi.fn(),
+            update:vi.fn()
         }
     }
 }));
 vi.mock("../../utils/deleteImage.js",()=>({
     deleteImage:vi.fn()
 }));
-
+describe("updatePostService",()=>{
+    beforeEach(()=>{
+        vi.clearAllMocks();
+    });
+    it("throws 404 when the post doesn't exists",async()=>{
+        vi.mocked(prisma.post.findUnique).mockResolvedValue(null);
+        await expect(
+            updatePostService(1,10,"testTitle","testContent","./test")
+        ).rejects.toMatchObject({
+            message:"Couldn't find the post.",
+            statusCode:404
+        })
+    });
+})
 describe("deletePostService",()=>{
     beforeEach(()=>{
         vi.clearAllMocks();
