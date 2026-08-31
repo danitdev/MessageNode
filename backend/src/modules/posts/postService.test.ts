@@ -4,6 +4,7 @@ import {prisma} from "../../lib/prisma.js";
 import { deleteImage } from "../../utils/deleteImage.js";
 import { deletePost, getPost } from "./postController.js";
 
+
 vi.mock("../../lib/prisma.js",()=>({
     prisma:{
         post:{
@@ -54,7 +55,28 @@ describe("getPostsService",()=>{
         expect(result).toEqual({posts:posts,totalItems:2});
         
     })
-
+    it("queries posts with the correct pagination and ordering", async () => {
+        vi.mocked(prisma.post.findMany).mockResolvedValue([]);
+        vi.mocked(prisma.post.count).mockResolvedValue(0);
+        await getPostsService(10,5,3);
+        expect(prisma.post.findMany).toHaveBeenCalledWith({
+            where:{
+                creatorId:10
+            },
+            include:{
+                creator:{
+                   select:{
+                    name:true
+                   } 
+                }
+            },
+            orderBy:{
+                createdAt:"desc"
+            },
+            skip:10,
+            take:5
+        })
+    })
 })
 
 describe("updatePostService",()=>{
