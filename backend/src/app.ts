@@ -8,6 +8,7 @@ import path from "path";
 import __root_dir from "./utils/path.js";
 import {AppError} from "./errors/AppError.js";
 import helmet from "helmet";
+import compression from "compression";
 
 //file storage declared
 const fileStorage = multer.diskStorage({
@@ -41,6 +42,7 @@ app.use(cors({
     origin:"http://localhost:3000"
 }));
 app.use(helmet());
+app.use(compression());
 app.use(express.json());
 app.use("/feed",postRoutes);
 app.use("/auth",authRoutes);
