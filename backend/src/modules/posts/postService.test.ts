@@ -76,6 +76,16 @@ describe("getPostsService",()=>{
             skip:10,
             take:5
         })
+    });
+    it("counts only posts belonging to thw user",async()=>{
+        vi.mocked(prisma.post.findMany).mockResolvedValue([]);
+        vi.mocked(prisma.post.count).mockResolvedValue(3);
+        await getPostsService(25,10,1);
+        expect(prisma.post.count).toHaveBeenCalledWith({
+            where:{
+                creatorId:25
+            }
+        })
     })
 })
 
