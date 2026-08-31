@@ -46,7 +46,47 @@ describe("updatePostService",()=>{
         });
         expect(prisma.post.update).not.toHaveBeenCalled();
     });
-
+    it("updates the post successfully",async()=>{
+        vi.mocked(prisma.post.findUnique).mockResolvedValue({
+            id:10,
+            content:"test content",
+            title:"test title",
+            imageUrl:null,
+            createdAt:new Date(),
+            creatorId:1
+        });
+        const updatedPost = {
+            id:10,
+            title:"new title",
+            content:"new content",
+            imageUrl:null,
+            createdAt:new Date(),
+            creatorId:1,
+            creator:{
+                name:"John"
+            }
+        };
+        vi.mocked(prisma.post.update).mockResolvedValue(updatedPost);
+        const result = await updatePostService(1,10,"new title","new content");
+        expect(result).toEqual(updatedPost);
+        expect(prisma.post.update).toHaveBeenCalledWith({
+            where:{
+                id:10
+            },
+            data:{
+                title:"new title",
+                content:"new content"
+            },
+            include:{
+                creator:{
+                    select:{
+                        name:true
+                    }
+                }
+            }
+        });
+        expect(deleteImage).not.toHaveBeenCalled();
+    });
     
 })
 describe("deletePostService",()=>{
