@@ -87,6 +87,48 @@ describe("updatePostService",()=>{
         });
         expect(deleteImage).not.toHaveBeenCalled();
     });
+    it("updates the post and delete the old image when a new image is provided",async()=>{
+        vi.mocked(prisma.post.findUnique).mockResolvedValue({
+            id:10,
+            content:"test content",
+            title:"test title",
+            createdAt:new Date(),
+            creatorId:1,
+            imageUrl:"/images/old.jpg"
+        });
+        const updatedPost = {
+            id:10,
+            content:"new content",
+            title:"new title",
+            imageUrl:"/images/new.jpg",
+            creatorId:1,
+            createdAt:new Date(),
+            creator:{
+                name:"john"
+            }
+        };
+        vi.mocked(prisma.post.update).mockResolvedValue(updatedPost);
+        const result = await updatePostService(1,10,"new title","new content","/images/new.jpg");
+        expect(result).toEqual(updatedPost);
+        expect(prisma.post.update).toHaveBeenCalledWith({
+            where:{
+                id:10,
+            },
+            data:{
+                title:"new title",
+                content:"new content",
+                imageUrl:"/images/new.jpg"
+            },
+            include:{
+                creator:{
+                    select:{
+                        name:true
+                    }
+                }
+            }
+        });
+        expect(deleteImage).toHaveBeenCalledWith("/images/old.jpg");
+    })
     
 })
 describe("deletePostService",()=>{
