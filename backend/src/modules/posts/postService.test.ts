@@ -2,7 +2,7 @@ import {describe,it,expect,vi,beforeEach} from "vitest";
 import {deletePostService,updatePostService,getPostService,getPostsService,postPostService} from "./postService.js";
 import {prisma} from "../../lib/prisma.js";
 import { deleteImage } from "../../utils/deleteImage.js";
-import { deletePost } from "./postController.js";
+import { deletePost, getPost } from "./postController.js";
 
 vi.mock("../../lib/prisma.js",()=>({
     prisma:{
@@ -19,6 +19,44 @@ vi.mock("../../lib/prisma.js",()=>({
 vi.mock("../../utils/deleteImage.js",()=>({
     deleteImage:vi.fn()
 }));
+describe("getPostsService",()=>{
+    beforeEach(()=>{
+        vi.clearAllMocks();
+    });
+    it("returns posts and total items",async()=>{
+        const posts = [
+            {
+                id: 1,
+                title: "Post 1",
+                content: "Content 1",
+                imageUrl: "/images/1.jpg",
+                creatorId: 10,
+                createdAt:new Date(),
+                creator: {
+                    name: "John",
+                },
+            },
+            {
+                id: 2,
+                title: "Post 2",
+                content: "Content 2",
+                imageUrl: "/images/2.jpg",
+                creatorId: 10,
+                createdAt:new Date(),
+                creator: {
+                    name: "John",
+                },
+            },
+        ];
+        vi.mocked(prisma.post.findMany).mockResolvedValue(posts)
+        vi.mocked(prisma.post.count).mockResolvedValue(2);
+        const result = await getPostsService(10,10,1);
+        expect(result).toEqual({posts:posts,totalItems:2});
+        
+    })
+
+})
+
 describe("updatePostService",()=>{
     beforeEach(()=>{
         vi.clearAllMocks();
