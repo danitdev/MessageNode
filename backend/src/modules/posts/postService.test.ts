@@ -29,6 +29,25 @@ describe("updatePostService",()=>{
             statusCode:404
         })
     });
+        it("throws 403 when the post doesn't belong to user",async()=>{
+        vi.mocked(prisma.post.findUnique).mockResolvedValue({
+            id:10,
+            title:"test post",
+            content:"test content",
+            imageUrl:null,
+            createdAt:new Date(),
+            creatorId:12
+        });
+        await expect(
+            updatePostService(2,10,"new title","new content")
+        ).rejects.toMatchObject({
+            message:"This post doesn't belong to this user!",
+            statusCode:403
+        });
+        expect(prisma.post.update).not.toHaveBeenCalled();
+    });
+
+    
 })
 describe("deletePostService",()=>{
     beforeEach(()=>{
