@@ -1,5 +1,5 @@
 import type {Request,Response,NextFunction} from "express";
-import {registerUserService,loginUserService} from "./authSevice.js";
+import {registerUserService,loginUserService} from "./authService.js";
 import {} from "./authSchema.js";
 import {AppError} from "../../errors/AppError.js";
 
